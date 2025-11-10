@@ -24,7 +24,7 @@ export class CameraController {
     this.maxPolarAngle = Math.PI; // radians
 
     // Rotation sensitivity
-    this.rotateSpeed = 0.005;
+    this.rotateSpeed = 0.5;
     this.zoomSpeed = 0.1;
 
     // Mouse state
@@ -87,9 +87,9 @@ export class CameraController {
     this.lastMouseX = event.clientX;
     this.lastMouseY = event.clientY;
 
-    // Rotate camera
-    this.rotateLeft(2 * Math.PI * deltaX / this.domElement.clientHeight * this.rotateSpeed);
-    this.rotateUp(2 * Math.PI * deltaY / this.domElement.clientHeight * this.rotateSpeed);
+    // Rotate camera (simplified calculation for better responsiveness)
+    this.rotateLeft(deltaX * this.rotateSpeed * 0.01);
+    this.rotateUp(deltaY * this.rotateSpeed * 0.01);
   }
 
   onMouseUp(event) {
