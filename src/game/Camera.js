@@ -8,46 +8,17 @@ export class GameCamera {
     // Create perspective camera
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-    // Set initial position
-    this.camera.position.set(0, 5, 10);
-    this.camera.lookAt(0, 0, 0);
-
-    // Camera follow settings
-    this.followTarget = null;
-    this.followOffset = new THREE.Vector3(0, 5, 10);
-    this.followSmoothness = 0.1;
-
-    // Camera target position (for smooth following)
-    this.targetPosition = new THREE.Vector3();
-  }
-
-  /**
-   * Set the target for the camera to follow
-   */
-  setFollowTarget(target, offset = null) {
-    this.followTarget = target;
-
-    if (offset) {
-      this.followOffset.copy(offset);
-    }
+    // Set initial position - good viewing angle for BJJ positions
+    // Position camera to view the mat from a side/elevated angle
+    this.camera.position.set(2, 1.5, 3);
+    this.camera.lookAt(0, 0.6, 0);
   }
 
   /**
    * Update camera position (called each frame)
    */
-  update(deltaTime, player = null) {
-    // Simple camera follow logic
-    if (player && player.mesh) {
-      // Calculate target position
-      this.targetPosition.copy(player.mesh.position);
-      this.targetPosition.add(this.followOffset);
-
-      // Smoothly interpolate camera position
-      this.camera.position.lerp(this.targetPosition, this.followSmoothness);
-
-      // Look at the player
-      this.camera.lookAt(player.mesh.position);
-    }
+  update(deltaTime) {
+    // Static camera for now - could add rotation/zoom controls later
   }
 
   /**

@@ -3,7 +3,9 @@ import { GameScene } from './Scene.js';
 import { GameCamera } from './Camera.js';
 import { GameRenderer } from './Renderer.js';
 import { InputSystem } from '../systems/InputSystem.js';
-import { Player } from './entities/Player.js';
+import { Fighter } from './entities/Fighter.js';
+import { positionsDatabase } from '../data/positions.js';
+import { PositionSelector } from '../ui/PositionSelector.js';
 
 /**
  * Main Game class - orchestrates all game systems and the game loop
@@ -35,7 +37,12 @@ export class Game {
 
     // Entities
     this.entities = [];
-    this.player = null;
+    this.fighter1 = null;
+    this.fighter2 = null;
+
+    // Position system
+    this.positionSelector = null;
+    this.currentPosition = null;
 
     // Animation frame ID
     this.animationFrameId = null;
@@ -65,9 +72,20 @@ export class Game {
     // Initialize systems
     this.inputSystem = new InputSystem();
 
-    // Create player
-    this.player = new Player(this.scene.scene);
-    this.entities.push(this.player);
+    // Create fighters
+    this.fighter1 = new Fighter(this.scene.scene, 0x00ff00, 'Fighter 1');
+    this.fighter2 = new Fighter(this.scene.scene, 0xff0000, 'Fighter 2');
+    this.entities.push(this.fighter1);
+    this.entities.push(this.fighter2);
+
+    // Create position selector UI
+    this.positionSelector = new PositionSelector(
+      positionsDatabase,
+      (position, index) => this.onPositionSelected(position, index)
+    );
+
+    // Set initial position
+    this.setPosition(positionsDatabase[0], false);
 
     // Hide loading screen
     this.hideLoadingScreen();
@@ -149,7 +167,33 @@ export class Game {
     }
 
     // Update camera (if it has follow logic, etc.)
-    this.camera.update(deltaTime, this.player);
+    this.camera.update(deltaTime);
+  }
+
+  /**
+   * Handle position selection from UI
+   */
+  onPositionSelected(position, index) {
+    this.setPosition(position, true);
+  }
+
+  /**
+   * Set fighters to a specific position
+   */
+  setPosition(position, animate = false) {
+    this.currentPosition = position;
+
+    if (animate) {
+      // Animate to the new position
+      this.fighter1.animateToPosition(position.fighter1, 1.0);
+      this.fighter2.animateToPosition(position.fighter2, 1.0);
+    } else {
+      // Set position instantly
+      this.fighter1.setPosition(position.fighter1);
+      this.fighter2.setPosition(position.fighter2);
+    }
+
+    console.log(`Position set to: ${position.name}`);
   }
 
   /**
@@ -230,6 +274,11 @@ export class Game {
     // Dispose systems
     if (this.inputSystem) {
       this.inputSystem.dispose();
+    }
+
+    // Dispose UI
+    if (this.positionSelector) {
+      this.positionSelector.dispose();
     }
 
     // Dispose scene

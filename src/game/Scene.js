@@ -20,37 +20,39 @@ export class GameScene {
    * Setup basic scene properties
    */
   setupScene() {
-    // Set background color
-    this.scene.background = new THREE.Color(0x87ceeb); // Sky blue
+    // Set background color - neutral gray like GrappleMap
+    this.scene.background = new THREE.Color(0x2a2a2a); // Dark gray
 
-    // Add fog for depth perception
-    this.scene.fog = new THREE.Fog(0x87ceeb, 10, 50);
+    // Add a simple ground plane to represent the mat
+    const matGeometry = new THREE.PlaneGeometry(6, 6);
+    const matMaterial = new THREE.MeshLambertMaterial({
+      color: 0x1a1a1a,
+      side: THREE.DoubleSide
+    });
+    const mat = new THREE.Mesh(matGeometry, matMaterial);
+    mat.rotation.x = -Math.PI / 2;
+    mat.position.y = 0;
+    mat.receiveShadow = true;
+    this.scene.add(mat);
   }
 
   /**
    * Setup scene lighting
    */
   setupLighting() {
-    // Ambient light for overall illumination
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Ambient light for overall illumination - brighter for clear visibility
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     this.scene.add(ambientLight);
 
-    // Directional light for shadows and definition
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 10, 5);
-    directionalLight.castShadow = true;
-
-    // Configure shadow properties
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 50;
-    directionalLight.shadow.camera.left = -10;
-    directionalLight.shadow.camera.right = 10;
-    directionalLight.shadow.camera.top = 10;
-    directionalLight.shadow.camera.bottom = -10;
-
+    // Directional light for definition
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight.position.set(3, 5, 4);
     this.scene.add(directionalLight);
+
+    // Add a second light from another angle for better visibility
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    fillLight.position.set(-3, 3, -2);
+    this.scene.add(fillLight);
 
     // Store reference for later access
     this.directionalLight = directionalLight;
