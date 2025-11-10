@@ -8,9 +8,9 @@ export class GameCamera {
     // Create perspective camera
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-    // Set initial position
-    this.camera.position.set(0, 5, 10);
-    this.camera.lookAt(0, 0, 0);
+    // Set initial position - optimized for GrappleMap view
+    this.camera.position.set(0, 2, 5);
+    this.camera.lookAt(0, 0.8, 0);
 
     // Camera follow settings
     this.followTarget = null;

@@ -3,7 +3,8 @@ import { GameScene } from './Scene.js';
 import { GameCamera } from './Camera.js';
 import { GameRenderer } from './Renderer.js';
 import { InputSystem } from '../systems/InputSystem.js';
-import { Player } from './entities/Player.js';
+import { GrappleMapScene } from '../grapplemap/GrappleMapScene.js';
+import { GrappleMapUI } from '../grapplemap/GrappleMapUI.js';
 
 /**
  * Main Game class - orchestrates all game systems and the game loop
@@ -33,9 +34,9 @@ export class Game {
     // Systems
     this.inputSystem = null;
 
-    // Entities
-    this.entities = [];
-    this.player = null;
+    // GrappleMap
+    this.grappleMapScene = null;
+    this.grappleMapUI = null;
 
     // Animation frame ID
     this.animationFrameId = null;
@@ -65,9 +66,9 @@ export class Game {
     // Initialize systems
     this.inputSystem = new InputSystem();
 
-    // Create player
-    this.player = new Player(this.scene.scene);
-    this.entities.push(this.player);
+    // Create GrappleMap scene and UI
+    this.grappleMapScene = new GrappleMapScene(this.scene.scene);
+    this.grappleMapUI = new GrappleMapUI(this.grappleMapScene);
 
     // Hide loading screen
     this.hideLoadingScreen();
@@ -143,13 +144,13 @@ export class Game {
     // Update input system
     this.inputSystem.update();
 
-    // Update all entities
-    for (const entity of this.entities) {
-      entity.update(deltaTime);
+    // Update GrappleMap animation
+    if (this.grappleMapScene) {
+      this.grappleMapScene.update(deltaTime);
     }
 
-    // Update camera (if it has follow logic, etc.)
-    this.camera.update(deltaTime, this.player);
+    // Update camera
+    this.camera.update(deltaTime, null);
   }
 
   /**
@@ -221,11 +222,13 @@ export class Game {
       cancelAnimationFrame(this.animationFrameId);
     }
 
-    // Dispose entities
-    for (const entity of this.entities) {
-      entity.dispose();
+    // Dispose GrappleMap
+    if (this.grappleMapUI) {
+      this.grappleMapUI.dispose();
     }
-    this.entities = [];
+    if (this.grappleMapScene) {
+      this.grappleMapScene.dispose();
+    }
 
     // Dispose systems
     if (this.inputSystem) {
