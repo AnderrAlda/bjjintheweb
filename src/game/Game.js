@@ -66,6 +66,9 @@ export class Game {
     // Initialize systems
     this.inputSystem = new InputSystem();
 
+    // Initialize camera controls (requires renderer to be created first)
+    this.camera.initController(this.inputSystem, this.renderer.renderer.domElement);
+
     // Create GrappleMap scene and UI
     this.grappleMapScene = new GrappleMapScene(this.scene.scene);
     this.grappleMapUI = new GrappleMapUI(this.grappleMapScene);
@@ -228,6 +231,11 @@ export class Game {
     }
     if (this.grappleMapScene) {
       this.grappleMapScene.dispose();
+    }
+
+    // Dispose camera
+    if (this.camera) {
+      this.camera.dispose();
     }
 
     // Dispose systems

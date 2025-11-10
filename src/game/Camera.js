@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CameraController } from './CameraController.js';
 
 /**
  * GameCamera class - manages the three.js camera
@@ -19,6 +20,10 @@ export class GameCamera {
 
     // Camera target position (for smooth following)
     this.targetPosition = new THREE.Vector3();
+
+    // Camera controller (will be initialized later)
+    this.controller = null;
+    this.controlsEnabled = false;
   }
 
   /**
@@ -33,9 +38,33 @@ export class GameCamera {
   }
 
   /**
+   * Initialize camera controller
+   */
+  initController(inputSystem, domElement) {
+    this.controller = new CameraController(this.camera, inputSystem, domElement);
+    this.controlsEnabled = true;
+  }
+
+  /**
+   * Enable/disable orbit controls
+   */
+  setControlsEnabled(enabled) {
+    this.controlsEnabled = enabled;
+    if (this.controller) {
+      this.controller.setEnabled(enabled);
+    }
+  }
+
+  /**
    * Update camera position (called each frame)
    */
   update(deltaTime, player = null) {
+    // If orbit controls are enabled, use controller
+    if (this.controlsEnabled && this.controller) {
+      this.controller.update();
+      return;
+    }
+
     // Simple camera follow logic
     if (player && player.mesh) {
       // Calculate target position
@@ -69,5 +98,14 @@ export class GameCamera {
    */
   lookAt(x, y, z) {
     this.camera.lookAt(x, y, z);
+  }
+
+  /**
+   * Dispose camera resources
+   */
+  dispose() {
+    if (this.controller) {
+      this.controller.dispose();
+    }
   }
 }
